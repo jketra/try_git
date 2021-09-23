@@ -1,11 +1,13 @@
 #pragma once
 
-namespace hw1 {
+namespace hw1
+{
 
-template<typename T>
-struct Boundaries {
-	T min;
-	T max;
+template <typename T>
+struct Boundaries
+{
+    T min;
+    T max;
 };
 
-}
+}  // namespace hw1
