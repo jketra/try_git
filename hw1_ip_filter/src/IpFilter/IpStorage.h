@@ -82,6 +82,9 @@ class IpStorage
 
     void part2()
     {
+        part1();
+        std::cout << "Hello, World!" << std::endl;
+
         auto boundaries = IpRestrictions::boundaries;
         for (unsigned i = 0; i < filteringBytes.size(); ++i)
         {
@@ -96,7 +99,7 @@ class IpStorage
     template <typename... Args, typename = hw_libs::sfinae::CheckTypes<Byte, Args...>>
     std::tuple<Iterator, Iterator> filteredByBytes(Byte head, Args... tail)
     {
-        static_assert(sizeof...(tail) < Ip::bytesNumber(), "The number of input bytes mustn't exceed 4");
+        static_assert(sizeof...(tail) < Ip::bytesNumber(), "The number of input bytes mustn't exceed four");
 
         std::array<Byte, sizeof...(tail) + 1u> filteringBytes{head, tail...};
 
