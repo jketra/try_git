@@ -46,11 +46,11 @@ class IpStorage
 
 
     template <typename T, typename = hw_libs::sfinae::CheckType<Ip, T>>
-    OperationResult add(T&& ip)
+    OperationResult addIp(T&& ip)
     {
         if (validateIp(ip))
         {
-            _storage.insert(std::forward<T>(ip));
+            m_container.insert(std::forward<T>(ip));
             return OperationResult::Success();
         }
 
@@ -59,33 +59,36 @@ class IpStorage
     }
 
 
-    const Container& getAllIps() const { return _storage; }
+    const Container& allIps() const { return m_container; }
 
 
-    Container getIpsContainsByte(Byte byte) const
+    void partMethod()
     {
-        Container result;
         std::vector<IpV4> vet;
-        std::copy_if(std::begin(_storage),
-                     std::end(_storage),
+        std::copy_if(std::begin(m_container),
+                     std::end(m_container),
                      std::inserter(result, std::begin(result)),
                      [&byte](const IpV4& ip)
                      {
                          return ip.contains(byte);
                      });
+    }
+
+    Container getIpsWithByte(Byte byte) const
+    {
+        Container result;
+        partMethod();
 
         return std::move(result);
     }
 
-    bool empty() const { return _storage.empty(); }
+    bool empty() const { return m_container.empty(); }
 
 
-    template <typename... Args, typename = hw_libs::sfinae::CheckTypes<Byte, Args...>>
-    std::tuple<Iterator, Iterator> filteredByFirstBytes(Byte head, Args... tail)
+    void part2()
     {
-        static_assert(sizeof...(tail) < Ip::bytesNumber(), "The number of input bytes mustn't exceed 4");
-
-        std::array<Byte, sizeof...(tail) + 1u> filteringBytes{head, tail...};
+        part1();
+        std::cout << "Hello, World!" << std::endl;
 
         auto boundaries = IpRestrictions::boundaries;
         for (unsigned i = 0; i < filteringBytes.size(); ++i)
@@ -94,14 +97,22 @@ class IpStorage
             boundaries.max.byte(i) = filteringBytes[i];
         }
 
-        auto begin = std::lower_bound(std::begin(_storage), std::end(_storage), boundaries.min);
-        auto end = std::upper_bound(std::begin(_storage), std::end(_storage), boundaries.max);
+        auto begin = std::lower_bound(std::begin(m_container), std::end(m_container), boundaries.min);
+        auto end = std::upper_bound(std::begin(m_container), std::end(m_container), boundaries.max);
+    }
 
-        return std::make_tuple(begin, end);
+    template <typename... Args, typename = hw_libs::sfinae::CheckTypes<Byte, Args...>>
+    std::tuple<Iterator, Iterator> filteredByBytes(Byte head, Args... tail)
+    {
+        static_assert(sizeof...(tail) < Ip::bytesNumber(), "The number of input bytes mustn't exceed four");
+
+        std::array<Byte, sizeof...(tail) + 1u> filteringBytes{head, tail...};
+
+        part2();
     }
 
   private:
-    Container _storage;
+    Container m_container;
 };
 
 }  // namespace hw1
