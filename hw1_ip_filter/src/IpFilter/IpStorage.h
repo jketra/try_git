@@ -43,11 +43,11 @@ class IpStorage
     }
 
     template <typename T, typename = hw_libs::sfinae::CheckType<Ip, T>>
-    OperationResult add(T&& ip)
+    OperationResult addIp(T&& ip)
     {
         if (validateIp(ip))
         {
-            _storage.insert(std::forward<T>(ip));
+            m_storage.insert(std::forward<T>(ip));
             return OperationResult::Success();
         }
 
@@ -55,14 +55,14 @@ class IpStorage
     }
 
 
-    const Container& getAllIps() const { return _storage; }
+    const Container& allIps() const { return m_storage; }
 
-    Container getIpsContainsByte(Byte byte) const
+    Container getIpsWithByte(Byte byte) const
     {
         Container result;
         std::vector<IpV4> vet;
-        std::copy_if(std::begin(_storage),
-                     std::end(_storage),
+        std::copy_if(std::begin(m_storage),
+                     std::end(m_storage),
                      std::inserter(result, std::begin(result)),
                      [&byte](const IpV4& ip)
                      {
@@ -72,10 +72,10 @@ class IpStorage
         return std::move(result);
     }
 
-    bool empty() const { return _storage.empty(); }
+    bool empty() const { return m_storage.empty(); }
 
     template <typename... Args, typename = hw_libs::sfinae::CheckTypes<Byte, Args...>>
-    std::tuple<Iterator, Iterator> filteredByFirstBytes(Byte head, Args... tail)
+    std::tuple<Iterator, Iterator> filteredByBytes(Byte head, Args... tail)
     {
         static_assert(sizeof...(tail) < Ip::bytesNumber(), "The number of input bytes mustn't exceed 4");
 
@@ -88,14 +88,14 @@ class IpStorage
             boundaries.max.byte(i) = filteringBytes[i];
         }
 
-        auto begin = std::lower_bound(std::begin(_storage), std::end(_storage), boundaries.min);
-        auto end = std::upper_bound(std::begin(_storage), std::end(_storage), boundaries.max);
+        auto begin = std::lower_bound(std::begin(m_storage), std::end(m_storage), boundaries.min);
+        auto end = std::upper_bound(std::begin(m_storage), std::end(m_storage), boundaries.max);
 
         return std::make_tuple(begin, end);
     }
 
   private:
-    Container _storage;
+    Container m_storage;
 };
 
 }  // namespace hw1
