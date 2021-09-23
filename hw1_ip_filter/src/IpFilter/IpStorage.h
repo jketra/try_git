@@ -14,12 +14,12 @@
 /// The second part of the first homework (ip filter).
 namespace hw1
 {
-
 template <typename IpType>
 class IpStorage
 {
     using IpRestrictions = Restrictions<IpType>;
     using Byte = typename IpType::Byte;
+
 
   public:
     using Ip = IpType;
@@ -27,7 +27,9 @@ class IpStorage
     using Iterator = typename Container::iterator;
     using OperationResult = hw_libs::OperationResult;
 
+
     IpStorage() = default;
+
 
     OperationResult add(const std::string& ipStr)
     {
@@ -42,6 +44,7 @@ class IpStorage
         return add(std::move(ip));
     }
 
+
     template <typename T, typename = hw_libs::sfinae::CheckType<Ip, T>>
     OperationResult addIp(T&& ip)
     {
@@ -51,11 +54,13 @@ class IpStorage
             return OperationResult::Success();
         }
 
+
         return std::move(OperationResult::Fail("Invalid Ip: ") << ip);
     }
 
 
     const Container& allIps() const { return m_container; }
+
 
     Container getIpsWithByte(Byte byte) const
     {
@@ -73,6 +78,7 @@ class IpStorage
     }
 
     bool empty() const { return m_container.empty(); }
+
 
     template <typename... Args, typename = hw_libs::sfinae::CheckTypes<Byte, Args...>>
     std::tuple<Iterator, Iterator> filteredByBytes(Byte head, Args... tail)
