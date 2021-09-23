@@ -14,12 +14,12 @@
 /// The second part of the first homework (ip filter).
 namespace hw1
 {
-
 template <typename IpType>
 class IpStorage
 {
     using IpRestrictions = Restrictions<IpType>;
     using Byte = typename IpType::Byte;
+
 
   public:
     using Ip = IpType;
@@ -27,7 +27,9 @@ class IpStorage
     using Iterator = typename Container::iterator;
     using OperationResult = hw_libs::OperationResult;
 
+
     IpStorage() = default;
+
 
     OperationResult add(const std::string& ipStr)
     {
@@ -42,26 +44,29 @@ class IpStorage
         return add(std::move(ip));
     }
 
+
     template <typename T, typename = hw_libs::sfinae::CheckType<Ip, T>>
     OperationResult addIp(T&& ip)
     {
         if (validateIp(ip))
         {
-            m_storage.insert(std::forward<T>(ip));
+            m_container.insert(std::forward<T>(ip));
             return OperationResult::Success();
         }
+
 
         return std::move(OperationResult::Fail("Invalid Ip: ") << ip);
     }
 
 
-    const Container& allIps() const { return m_storage; }
+    const Container& allIps() const { return m_container; }
+
 
     void partMethod()
     {
         std::vector<IpV4> vet;
-        std::copy_if(std::begin(m_storage),
-                     std::end(m_storage),
+        std::copy_if(std::begin(m_container),
+                     std::end(m_container),
                      std::inserter(result, std::begin(result)),
                      [&byte](const IpV4& ip)
                      {
@@ -77,7 +82,7 @@ class IpStorage
         return std::move(result);
     }
 
-    bool empty() const { return m_storage.empty(); }
+    bool empty() const { return m_container.empty(); }
 
 
     void part2()
@@ -92,8 +97,8 @@ class IpStorage
             boundaries.max.byte(i) = filteringBytes[i];
         }
 
-        auto begin = std::lower_bound(std::begin(m_storage), std::end(m_storage), boundaries.min);
-        auto end = std::upper_bound(std::begin(m_storage), std::end(m_storage), boundaries.max);
+        auto begin = std::lower_bound(std::begin(m_container), std::end(m_container), boundaries.min);
+        auto end = std::upper_bound(std::begin(m_container), std::end(m_container), boundaries.max);
     }
 
     template <typename... Args, typename = hw_libs::sfinae::CheckTypes<Byte, Args...>>
@@ -107,7 +112,7 @@ class IpStorage
     }
 
   private:
-    Container m_storage;
+    Container m_container;
 };
 
 }  // namespace hw1
