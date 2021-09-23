@@ -47,7 +47,7 @@ class IpStorage
     {
         if (validateIp(ip))
         {
-            m_storage.insert(std::forward<T>(ip));
+            m_container.insert(std::forward<T>(ip));
             return OperationResult::Success();
         }
 
@@ -55,14 +55,14 @@ class IpStorage
     }
 
 
-    const Container& allIps() const { return m_storage; }
+    const Container& allIps() const { return m_container; }
 
     Container getIpsWithByte(Byte byte) const
     {
         Container result;
         std::vector<IpV4> vet;
-        std::copy_if(std::begin(m_storage),
-                     std::end(m_storage),
+        std::copy_if(std::begin(m_container),
+                     std::end(m_container),
                      std::inserter(result, std::begin(result)),
                      [&byte](const IpV4& ip)
                      {
@@ -72,7 +72,7 @@ class IpStorage
         return std::move(result);
     }
 
-    bool empty() const { return m_storage.empty(); }
+    bool empty() const { return m_container.empty(); }
 
     template <typename... Args, typename = hw_libs::sfinae::CheckTypes<Byte, Args...>>
     std::tuple<Iterator, Iterator> filteredByBytes(Byte head, Args... tail)
@@ -88,14 +88,14 @@ class IpStorage
             boundaries.max.byte(i) = filteringBytes[i];
         }
 
-        auto begin = std::lower_bound(std::begin(m_storage), std::end(m_storage), boundaries.min);
-        auto end = std::upper_bound(std::begin(m_storage), std::end(m_storage), boundaries.max);
+        auto begin = std::lower_bound(std::begin(m_container), std::end(m_container), boundaries.min);
+        auto end = std::upper_bound(std::begin(m_container), std::end(m_container), boundaries.max);
 
         return std::make_tuple(begin, end);
     }
 
   private:
-    Container m_storage;
+    Container m_container;
 };
 
 }  // namespace hw1
